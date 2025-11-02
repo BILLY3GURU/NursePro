@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isPublisher() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'publisher';
+    }
+    
+    function isVerifiedUser() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.emailVerified == true;
+    }
+
+    // Countries collection - public read, admin write
+    match /countries/{countryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Counties collection - public read, admin write
+    match /counties/{countyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Constituencies collection - public read, admin write
+    match /constituencies/{constituencyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Wards collection - public read, admin write
+    match /wards/{wardId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Achievements collection
+    match /achievements/{achievementId} {
+      allow read: if true;
+      // Allow authenticated users to submit achievements
+      allow create: if isAuthenticated() && 
+        request.resource.data.authorId == request.auth.uid &&
+        request.resource.data.status == 'pending';
+      // Allow users to edit their own pending achievements
+      allow update: if isAuthenticated() &&
+        resource.data.authorId == request.auth.uid &&
+        resource.data.status == 'pending';
+      // Allow admins full access
+      allow write: if isAdmin();
+    }
+
+    // Posts collection
+    match /posts/{postId} {
+      allow read: if true;
+      // Allow publishers to create and edit their own posts
+      allow create: if isPublisher() && 
+        request.resource.data.authorId == request.auth.uid &&
+        (request.resource.data.status == 'draft' || 
+         request.resource.data.status == 'pending_payment');
+      allow update: if isPublisher() &&
+        resource.data.authorId == request.auth.uid &&
+        (resource.data.status == 'draft' || 
+         resource.data.status == 'pending_payment');
+      // Allow admins full access
+      allow write: if isAdmin();
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read and update their own data
+      allow read, write: if request.auth.uid == userId;
+      // Admins can read all user data
+      allow read: if isAdmin();
+      // Public profile fields are readable
+      allow read: if request.query.limit == 1 &&
+        request.query.select == ['displayName', 'photoURL', 'bio'];
+    }
+
+    // Payments collection
+    match /payments/{paymentId} {
+      // Users can read their own payments
+      allow read: if resource.data.userId == request.auth.uid;
+      // Only cloud functions can write payments (for M-Pesa integration)
+      allow write: if false;
+    }
+
+    // Comments collection
+    match /comments/{commentId} {
+      allow read: if true;
+      // Authenticated users can create comments
+      allow create: if isAuthenticated() &&
+        request.resource.data.authorId == request.auth.uid &&
+        !request.resource.data.isBlocked;
+      // Users can edit their own non-blocked comments
+      allow update: if isAuthenticated() &&
+        resource.data.authorId == request.auth.uid &&
+        !resource.data.isBlocked;
+      // Admins can moderate comments
+      allow write: if isAdmin();
+    }
+
+    // Verifications collection
+    match /verifications/{verificationId} {
+      allow read: if true;
+      // Only admins and assigned verifiers can write
+      allow write: if isAdmin() || 
+        (isAuthenticated() && 
+         resource.data.verifierId == request.auth.uid);
+    }
+  }
+}
