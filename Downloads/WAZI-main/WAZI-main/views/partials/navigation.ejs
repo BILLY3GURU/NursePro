@@ -1,0 +1,87 @@
+<nav
+  class="fixed top-0 w-full bg-black/95 backdrop-blur-sm z-50 border-b border-red-900/20"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+      <div
+        class="flex items-center space-x-3 cursor-pointer"
+        onclick="navigateTo('home')"
+      >
+        <div
+          class="w-10 h-10 bg-gradient-to-br from-red-600 to-green-600 rounded-lg flex items-center justify-center"
+        >
+          <span class="text-white font-bold text-xl">W</span>
+        </div>
+        <div>
+          <div class="text-white font-bold text-lg">WaziAI</div>
+          <div class="text-gray-400 text-xs">
+            AI-Driven Integrity for a Prosperous Kenya
+          </div>
+        </div>
+      </div>
+
+      <div class="hidden md:flex space-x-8">
+        <button
+          onclick="navigateTo('home')"
+          class="text-sm font-medium transition-colors <%= currentPage === 'home' ? 'text-red-600' : 'text-gray-300 hover:text-white' %>"
+        >
+          Home
+        </button>
+        <button
+          onclick="navigateTo('solution')"
+          class="text-sm font-medium transition-colors <%= currentPage === 'solution' ? 'text-red-600' : 'text-gray-300 hover:text-white' %>"
+        >
+          AI-Driven Integrity
+        </button>
+        <button
+          onclick="navigateTo('data')"
+          class="text-sm font-medium transition-colors <%= currentPage === 'data' ? 'text-red-600' : 'text-gray-300 hover:text-white' %>"
+        >
+          Real Savings
+        </button>
+        <button
+          onclick="navigateTo('engage')"
+          class="text-sm font-medium transition-colors <%= currentPage === 'engage' ? 'text-red-600' : 'text-gray-300 hover:text-white' %>"
+        >
+          Join the Movement
+        </button>
+      </div>
+
+      <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+        <span id="menu-icon">☰</span>
+      </button>
+    </div>
+  </div>
+
+  <div
+    id="mobile-menu"
+    class="md:hidden bg-black border-t border-red-900/20 hidden"
+  >
+    <div class="px-4 py-4 space-y-3">
+      <button
+        onclick="navigateTo('home')"
+        class="block w-full text-left py-2 text-sm font-medium transition-colors <%= currentPage === 'home' ? 'text-red-600' : 'text-gray-300 hover:text-white' %>"
+      >
+        Home
+      </button>
+      <button
+        onclick="navigateTo('solution')"
+        class="block w-full text-left py-2 text-sm font-medium transition-colors <%= currentPage === 'solution' ? 'text-red-600' : 'text-gray-300 hover:text-white' %>"
+      >
+        AI-Driven Integrity
+      </button>
+      <button
+        onclick="navigateTo('data')"
+        class="block w-full text-left py-2 text-sm font-medium transition-colors <%= currentPage === 'data' ? 'text-red-600' : 'text-gray-300 hover:text-white' %>"
+      >
+        Real Savings
+      </button>
+      <button
+        onclick="navigateTo('engage')"
+        class="block w-full text-left py-2 text-sm font-medium transition-colors <%= currentPage === 'engage' ? 'text-red-600' : 'text-gray-300 hover:text-white' %>"
+      >
+        Join the Movement
+      </button>
+    </div>
+  </div>
+</nav>
